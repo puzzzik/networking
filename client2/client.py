@@ -1,4 +1,6 @@
-from server1 import MinioServer as serv1
+from server import MinioServer
+
+
 if __name__ == '__main__':
-    server = serv1()
+    server = MinioServer()
     resp = server.upload_file('test.txt')
