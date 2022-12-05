@@ -44,7 +44,11 @@ class MinioServer:
 
     def _check_file(self, file_name: str):
         if not os.path.exists(file_name):
-            self._download_file(file_name=file_name)
+            print(f"file {file_name} doesnt exist on client")
+            try:
+                self.download_file(file_name=file_name)
+            except S3Error:
+                raise
             return
 
         print(f"file {file_name} exists on client")
@@ -57,22 +61,22 @@ class MinioServer:
             self._upload_file(file_name=file_name)
         print(f"file {file_name} exists on server")
 
-    def _download_file(self, file_name: str, from_server=False):
-        file_path = file_name
-        if from_server:
-            file_path = self._make_file_from_server(file_name)
+    def download_file(self, file_name: str):
+        # file_path = file_name
+        # if from_server:
+        #     file_path = self._make_file_from_server(file_name)
 
         try:
-            self._minio_client.fget_object(bucket_name=self._bucket_name, object_name=file_name, file_path=file_path)
-            print(f"file {file_path} successfully downloaded from server")
+            self._minio_client.fget_object(bucket_name=self._bucket_name, object_name=file_name, file_path=file_name)
+            print(f"file {file_name} successfully downloaded from server")
         except InvalidResponseError as error:
             print(error)
         except S3Error:
             print(f"file {file_name} doesnt exist on server")
 
-    def _make_file_from_server(self, file_name: str):
-        first, second = file_name.split('.', maxsplit=1)
-        return first + "_from_server" + '.' + second
+    # def _make_file_from_server(self, file_name: str):
+    #     first, second = file_name.split('.', maxsplit=1)
+    #     return first + "_from_server" + '.' + second
 
     def _upload_file(self, file_name: str):
         try:
@@ -99,11 +103,13 @@ class MinioServer:
         remote_hash = tags['hash']
         return remote_hash == local_hash
 
-    def download_file(self, file_name: str):
-        self._download_file(file_name, from_server=not self._files_equal(file_name))
 
     def upload_file(self, file_name: str):
-        self._check_file(file_name)
+        try:
+            self._check_file(file_name)
+        except FileExistsError:
+            print(f"file {file_name} doesnt exist anywhere")
+            return
         if self._files_equal(file_name):
             self._upload_file(file_name=file_name)
         else:
@@ -114,10 +120,9 @@ class MinioServer:
             # self._download_file(file_name=file_name, from_server=True)
 
             if remote_date > local_date:
-                self._download_file(file_name=file_name, from_server=True)
+                self.download_file(file_name=file_name)
             else:
                 self._upload_file(file_name)
-
 
     def _md5(self, file_name):
         hash_md5 = hashlib.md5()
