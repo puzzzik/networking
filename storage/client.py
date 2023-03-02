@@ -1,4 +1,4 @@
-from server import MinioServer
+from storage.server import MinioServer
 
 
 if __name__ == '__main__':
