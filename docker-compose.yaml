@@ -1,105 +1,75 @@
-# устанавливаем версию в соотвествии с необходимой нам
-# подробнее на https://docs.docker.com/compose/compose-file/compose-versioning/
 version: '3.7'
 
-# настройки и конфигурации, общие для всех контейнеров
+# Settings and configurations that are common for all containers
 x-minio-common: &minio-common
-  image: quay.io/minio/minio # устанавливаем image
-  # команда которая выполняется при запуске контейнера
-  # --console-address ":9001" - указываем запустить консоль администратора на порту 9001
-  #  http://minio{1...4}/data{1...2}  - указывает ноде адреса других нод,
-  # чтобы они могли связаться между собой
-  # если сломается одна из нод,
-  # остальные ноды это поймут и будут предпринимать действия чтобы сохранить файлы
-  command: server --console-address ":9001" http://minio{1...4}/data{1...2} 
-
-  environment:
-    MINIO_ROOT_USER: minioadmin
-    MINIO_ROOT_PASSWORD: minioadmin
-    CI: true
-    MINIO_CI_CD: true
+  image: quay.io/minio/minio:RELEASE.2023-02-27T18-10-45Z
+  command: server --console-address ":9001" http://minio{1...4}/data{1...2}
   expose:
-    - "9000" # открыть порты
+    - "9000"
     - "9001"
-  healthcheck: # проверка состояния работоспособности кластера происходит путем выполнения get запроса на http://localhost:9000/minio/health/live
+  # environment:
+    # MINIO_ROOT_USER: minioadmin
+    # MINIO_ROOT_PASSWORD: minioadmin
+  healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
     interval: 30s
     timeout: 20s
     retries: 3
 
-# запускает 4 контейнера docker, в которых запущены экземпляры сервера minio.
-# используя обратный прокси-сервер nginx, балансировку нагрузки, вы можете получить доступ
-# через порт 9000.
+# starts 4 docker containers running minio server instances.
+# using nginx reverse proxy, load balancing, you can access
+# it through port 9000.
 services:
   minio1:
     <<: *minio-common
-    hostname: minio1 # указываем что адрес внутри подсети docker будет http://minio1:9000/ и на порту 9001 для админки соотвественно
-    volumes: # куда физически переадресовать* память(в какие разделы) из виртуальной(в докере) на вашу машину. по сути это работает как хард линк на файл/папку
-      # - data1-1:/Users/puzzzik/Developer/networking/data1
-      # - data1-2:/Users/puzzzik/Developer/networking/data2 
-      - '/Users/puzzzik/Developer/networking/data1:/data1'
-      - '/Users/puzzzik/Developer/networking/data2:/data2'
+    hostname: minio1
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
 
-
-  minio2: # аналогично ставим 2-4 ноды
+  minio2:
     <<: *minio-common
     hostname: minio2
     volumes:
-      # - "data2:/Users/puzzzik/Developer/networking/data2:rw" 
-      # - data2-1:/Users/puzzzik/Developer/networking/data1
-      # - data2-2:/Users/puzzzik/Developer/networking/data2
-      - '/Users/puzzzik/Developer/networking/data1:/data1'
-      - '/Users/puzzzik/Developer/networking/data2:/data2'
+      - data2-1:/data1
+      - data2-2:/data2
+
   minio3:
     <<: *minio-common
     hostname: minio3
     volumes:
-      # - "data3:/Users/puzzzik/Developer/networking/data3:rw" 
-      # - data3-1:/Users/puzzzik/Developer/networking/data1
-      # - data3-2:/Users/puzzzik/Developer/networking/data2
-      - '/Users/puzzzik/Developer/networking/data1:/data1'
-      - '/Users/puzzzik/Developer/networking/data2:/data2'
-
+      - data3-1:/data1
+      - data3-2:/data2
 
   minio4:
     <<: *minio-common
     hostname: minio4
     volumes:
-      # - "data4:/Users/puzzzik/Developer/networking/data4:rw" 
-      # - data4-1:/Users/puzzzik/Developer/networking/data1
-      # - data4-2:/Users/puzzzik/Developer/networking/data2
-      - '/Users/puzzzik/Developer/networking/data1:/data1'
-      - '/Users/puzzzik/Developer/networking/data2:/data2'
+      - data4-1:/data1
+      - data4-2:/data2
 
-
-  nginx: # наш еще один сервис в подсети docker будет nginx
-    image: nginx:1.19.2-alpine # исходники сервиса взять отсюда
-    hostname: nginx # hostname внутри подсети docker будет nginx
+  nginx:
+    image: nginx:1.19.2-alpine
+    hostname: nginx
     volumes:
-      # куда физически переадресовать* память(в какие разделы) из виртуальной(в докере) на вашу машину. по сути это работает как хард линк на файл/папку.
-      # доступ даем на ro (read only)
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "9000:9000" # форвардим порт 9000 из нашей локальной сети(localhost) (forward port) на исхоодный(внутри подсети docker)(source port)
-      - "9001:9001" # левый порт - порт вашей локальной сети компьютера, таргетный. порт справа - соурс порт - порт внутри подсети докера.
-    depends_on: # не запускай nginx пока не запустится весь кластер minio
+      - "9000:9000"
+      - "9001:9001"
+    depends_on:
       - minio1
       - minio2
       - minio3
       - minio4
 
-## По умолчанию в этой конфигурации используется локальный драйвер docker по умолчанию,
-## Для пользовательских томов замените на конфигурацию драйвера тома.
-# volumes:
-#   data1-1:
-#   data1-2:
-#   data2-1:
-#   data2-2:
-#   data3-1:
-#   data3-2:
-#   data4-1:
-#   data4-2:
-
-
-
-    
+## By default this config uses default local driver,
+## For custom volumes replace with volume driver configuration.
+volumes:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+  data3-1:
+  data3-2:
+  data4-1:
+  data4-2:

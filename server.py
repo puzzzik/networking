@@ -19,7 +19,7 @@ class MinioServer:
 
     @staticmethod
     def _get_minio_client():
-        dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
         if os.path.exists(dotenv_path):
             load_dotenv(dotenv_path)
 
@@ -37,8 +37,8 @@ class MinioServer:
         if not self._minio_client.bucket_exists(self._bucket_name):
             try:
                 self._minio_client.make_bucket(self._bucket_name)
-                self._minio_client.set_bucket_versioning(self._bucket_name, VersioningConfig(status='ENABLED',
-                                                                                             mfa_delete='ENABLED'))
+                self._minio_client.set_bucket_versioning(self._bucket_name, VersioningConfig(status=ENABLED,
+                                                                                             mfa_delete=ENABLED))
             except InvalidResponseError:
                 raise Exception
 
