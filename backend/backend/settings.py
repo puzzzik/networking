@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-lkjxjuqsqj7*iyqpc+yt6yuu5bn(_*turui#wg3j5)w0w%q$ab
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 
@@ -36,6 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app',
+    'rest_framework',
+    'authentication',
+    'drf_spectacular',
+    'spectacular',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -76,13 +82,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'localhost',
         'NAME': 'networking',
-        'USER': 'puzzzik',
-        'PASSWORD': '1234',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
         'PORT': '5432'
-        # 'HOST': os.environ.get('DB_HOST'),
-        # 'NAME': os.environ.get('DB_NAME'),
-        # 'USER': os.environ.get('DB_USER'),
-        # 'PASSWORD': os.environ.get('DB_PASS'),
     }
 }
 
@@ -124,3 +126,84 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'authentication.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authentication.backends.JWTAuthentication',
+    ),
+    'EXCEPTION_HANDLER': 'authentication.exceptions.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
+
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Back API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# ALLOWED_HOSTS=[ ]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
+# # CORS_ALLOWED_ORIGINS = [
+# #     "http://localhost:3000",
+# #     "http://127.0.0.1:3000",
+# # ]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "localhost"
+]
+CORS_ALLOW_CREDENTIALS = True
+# CORS_REPLACE_HTTPS_REFERER = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000/",
+    "http://127.0.0.1:3000/",
+    "http://localhost"
+]
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "Access-Control-Allow-Methods"
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'

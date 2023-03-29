@@ -14,8 +14,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+import app.urls
+import spectacular.urls
+from rest_framework import routers
+
+
+router = routers.DefaultRouter()
+# router.register(r'products', ProductViewSet, basename='products')
+# router.register(r'order', OrderViewSet)
+# router.register(r'cart', CartViewSet)
 
 urlpatterns = [
+    path('', include(spectacular.urls)),
     path('admin/', admin.site.urls),
+    path('', include(router.urls)),
+    path('', include('authentication.urls', namespace='authentication')),
+    path('', include(app.urls))
 ]

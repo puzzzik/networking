@@ -1,13 +1,12 @@
 import datetime
-
-from minio import Minio
+import hashlib
 import os
-from minio.tagging import Tags
-from minio.error import InvalidResponseError, S3Error
+
 from dotenv import load_dotenv
+from minio import Minio
+from minio.error import InvalidResponseError, S3Error
+from minio.tagging import Tags
 from minio.versioningconfig import VersioningConfig
-from urllib3.response import HTTPResponse
-import io, hashlib, hmac
 
 
 class MinioServer:
@@ -103,7 +102,6 @@ class MinioServer:
         remote_hash = tags['hash']
         return remote_hash == local_hash
 
-
     def upload_file(self, file_name: str):
         try:
             self._check_file(file_name)
@@ -137,3 +135,7 @@ class MinioServer:
         except OSError:
             print('no such file')
         return datetime.datetime.now()
+
+    def get_file_info(self, file_name: str):
+        try:
+            print(f"file {file_name} successfully downloaded from server")

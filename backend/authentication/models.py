@@ -74,9 +74,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
         return token
 
-    def get_cart(self):
+    def get_folder(self):
         try:
-            cart = self.cart
-            return cart
+            folder = self.folder
+            return folder
         except:
             return None
