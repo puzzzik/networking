@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import list_files
+from .views import *
 urlpatterns = [
-    path('get_files/', list_files)
+    path('get_file/', get_file),
+    path('list_files/', list_files),
+    path('post_file/', post_file)
 ]

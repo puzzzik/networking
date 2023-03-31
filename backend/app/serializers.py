@@ -1,13 +1,13 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from authentication.serializers import UserSerializer
-from models import *
+from .models import *
 
 
 class FileSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
-        fields = ['id', "name", "last_modified"]
+        fields = ['id', "name", "last_modified", "size", "hash", "url"]
 
 
 class FolderSerializer(serializers.ModelSerializer):
@@ -17,4 +17,4 @@ class FolderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Folder
 
-        fields = ['id', "user", "files"]
+        fields = ['id', "user", "files", "name"]

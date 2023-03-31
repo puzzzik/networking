@@ -137,5 +137,7 @@ class MinioServer:
         return datetime.datetime.now()
 
     def get_file_info(self, file_name: str):
-        try:
-            print(f"file {file_name} successfully downloaded from server")
+        # try:
+        #     print(f"file {file_name} successfully downloaded from server")
+
+

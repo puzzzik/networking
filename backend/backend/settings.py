@@ -156,7 +156,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Back API',
+    'TITLE': 'Service API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }

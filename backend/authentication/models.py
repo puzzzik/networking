@@ -75,8 +75,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return token
 
     def get_folder(self):
+        import sys
+        sys.path.append(".")
+
+        from ..app.models import Folder
         try:
             folder = self.folder
             return folder
         except:
             return None
+
