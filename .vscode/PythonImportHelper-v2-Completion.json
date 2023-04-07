@@ -250,14 +250,6 @@
         "documentation": {}
     },
     {
-        "label": "*",
-        "importPath": "models",
-        "description": "models",
-        "isExtraImport": true,
-        "detail": "models",
-        "documentation": {}
-    },
-    {
         "label": "TestCase",
         "importPath": "django.test",
         "description": "django.test",
@@ -343,6 +335,38 @@
         "description": "rest_framework.request",
         "isExtraImport": true,
         "detail": "rest_framework.request",
+        "documentation": {}
+    },
+    {
+        "label": "extend_schema",
+        "importPath": "drf_spectacular.utils",
+        "description": "drf_spectacular.utils",
+        "isExtraImport": true,
+        "detail": "drf_spectacular.utils",
+        "documentation": {}
+    },
+    {
+        "label": "OpenApiParameter",
+        "importPath": "drf_spectacular.utils",
+        "description": "drf_spectacular.utils",
+        "isExtraImport": true,
+        "detail": "drf_spectacular.utils",
+        "documentation": {}
+    },
+    {
+        "label": "OpenApiExample",
+        "importPath": "drf_spectacular.utils",
+        "description": "drf_spectacular.utils",
+        "isExtraImport": true,
+        "detail": "drf_spectacular.utils",
+        "documentation": {}
+    },
+    {
+        "label": "OpenApiTypes",
+        "importPath": "drf_spectacular.utils",
+        "description": "drf_spectacular.utils",
+        "isExtraImport": true,
+        "detail": "drf_spectacular.utils",
         "documentation": {}
     },
     {
@@ -635,6 +659,15 @@
         "documentation": {}
     },
     {
+        "label": "itertools",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "itertools",
+        "description": "itertools",
+        "detail": "itertools",
+        "documentation": {}
+    },
+    {
         "label": "Migration",
         "kind": 6,
         "importPath": "backend.app.migrations.0001_initial",
@@ -675,7 +708,7 @@
         "kind": 6,
         "importPath": "backend.app.models",
         "description": "backend.app.models",
-        "peekOfCode": "class Folder(models.Model):\n    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='folder',\n                                related_query_name='folder')\n    name = models.CharField(max_length=100)\n    files = models.ForeignKey(File, on_delete=models.CASCADE, related_name='files', blank=True, null=True)\n    def __str__(self):\n        return self.user.get_short_name() + 'folder'",
+        "peekOfCode": "class Folder(models.Model):\n    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='folder',\n                                related_query_name='folder')\n    name = models.CharField(max_length=100)\n    files = models.ForeignKey(File, on_delete=models.CASCADE, related_name='folder', blank=True, null=True)\n    def __str__(self):\n        return self.user.get_short_name() + 'folder'",
         "detail": "backend.app.models",
         "documentation": {}
     },
@@ -702,7 +735,7 @@
         "kind": 6,
         "importPath": "backend.app.serializers",
         "description": "backend.app.serializers",
-        "peekOfCode": "class FileSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = File\n        fields = ['id', \"name\", \"last_modified\"]\nclass FolderSerializer(serializers.ModelSerializer):\n    user = UserSerializer()\n    files = FileSerializer(many=True)\n    class Meta:\n        model = Folder\n        fields = ['id', \"user\", \"files\"]",
+        "peekOfCode": "class FileSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = File\n        fields = ['id', \"name\", \"last_modified\", \"size\", \"hash\", \"url\"]\nclass FolderSerializer(serializers.ModelSerializer):\n    user = UserSerializer()\n    files = FileSerializer(many=True)\n    class Meta:\n        model = Folder\n        fields = ['id', \"user\", \"files\", \"name\"]",
         "detail": "backend.app.serializers",
         "documentation": {}
     },
@@ -711,7 +744,7 @@
         "kind": 6,
         "importPath": "backend.app.serializers",
         "description": "backend.app.serializers",
-        "peekOfCode": "class FolderSerializer(serializers.ModelSerializer):\n    user = UserSerializer()\n    files = FileSerializer(many=True)\n    class Meta:\n        model = Folder\n        fields = ['id', \"user\", \"files\"]",
+        "peekOfCode": "class FolderSerializer(serializers.ModelSerializer):\n    user = UserSerializer()\n    files = FileSerializer(many=True)\n    class Meta:\n        model = Folder\n        fields = ['id', \"user\", \"files\", \"name\"]",
         "detail": "backend.app.serializers",
         "documentation": {}
     },
@@ -720,7 +753,7 @@
         "kind": 5,
         "importPath": "backend.app.urls",
         "description": "backend.app.urls",
-        "peekOfCode": "urlpatterns = [\n    path('get_files/', list_files)\n]",
+        "peekOfCode": "urlpatterns = [\n    path('get_file/', get_file),\n    path('list_files/', list_files),\n    path('post_file/', post_file)\n]",
         "detail": "backend.app.urls",
         "documentation": {}
     },
@@ -729,7 +762,7 @@
         "kind": 2,
         "importPath": "backend.app.views",
         "description": "backend.app.views",
-        "peekOfCode": "def list_files(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)\n    try:\n        folder = Folder.objects.get(user__pk=user.pk)\n        folder_serializer = FolderSerializer(folder)\n        return Response(folder_serializer.data)\n    except:\n        return Response([], status=status.HTTP_404_NOT_FOUND)\n@api_view(['POST'])",
+        "peekOfCode": "def list_files(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)\n    try:\n        folder = Folder.objects.get(user__pk=user.pk)\n        folder_serializer = FolderSerializer(folder)\n        return Response(folder_serializer.data)\n    except:\n        return Response([], status=status.HTTP_404_NOT_FOUND)\n@extend_schema(",
         "detail": "backend.app.views",
         "documentation": {}
     },
@@ -738,7 +771,25 @@
         "kind": 2,
         "importPath": "backend.app.views",
         "description": "backend.app.views",
-        "peekOfCode": "def get_file(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)",
+        "peekOfCode": "def get_file(request: Request):\n    file = File.objects.get(pk=request.file_id)\n    file_serializer = FileSerializer(file)\n    return Response(file_serializer.data)\n@extend_schema(request=FileSerializer)\n@api_view(['POST'])\ndef post_file_info(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)\n@extend_schema(",
+        "detail": "backend.app.views",
+        "documentation": {}
+    },
+    {
+        "label": "post_file_info",
+        "kind": 2,
+        "importPath": "backend.app.views",
+        "description": "backend.app.views",
+        "peekOfCode": "def post_file_info(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)\n@extend_schema(\n    parameters=[OpenApiParameter(\"file\", OpenApiTypes.BINARY)],\n    request={\"file\": OpenApiTypes.BINARY}\n)\n@api_view(['POST'])\ndef post_file(request: Request):\n    request_user = request.user",
+        "detail": "backend.app.views",
+        "documentation": {}
+    },
+    {
+        "label": "post_file",
+        "kind": 2,
+        "importPath": "backend.app.views",
+        "description": "backend.app.views",
+        "peekOfCode": "def post_file(request: Request):\n    request_user = request.user\n    user = User.objects.get(pk=request_user.pk)",
         "detail": "backend.app.views",
         "documentation": {}
     },
@@ -1062,7 +1113,7 @@
         "kind": 5,
         "importPath": "backend.backend.settings",
         "description": "backend.backend.settings",
-        "peekOfCode": "SESSION_ENGINE = \"django.contrib.sessions.backends.cache\"\nSESSION_CACHE_ALIAS = \"default\"\nSPECTACULAR_SETTINGS = {\n    'TITLE': 'Back API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True",
+        "peekOfCode": "SESSION_ENGINE = \"django.contrib.sessions.backends.cache\"\nSESSION_CACHE_ALIAS = \"default\"\nSPECTACULAR_SETTINGS = {\n    'TITLE': 'Service API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True",
         "detail": "backend.backend.settings",
         "documentation": {}
     },
@@ -1071,7 +1122,7 @@
         "kind": 5,
         "importPath": "backend.backend.settings",
         "description": "backend.backend.settings",
-        "peekOfCode": "SESSION_CACHE_ALIAS = \"default\"\nSPECTACULAR_SETTINGS = {\n    'TITLE': 'Back API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True\n# # CORS_ALLOWED_ORIGINS = [",
+        "peekOfCode": "SESSION_CACHE_ALIAS = \"default\"\nSPECTACULAR_SETTINGS = {\n    'TITLE': 'Service API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True\n# # CORS_ALLOWED_ORIGINS = [",
         "detail": "backend.backend.settings",
         "documentation": {}
     },
@@ -1080,7 +1131,7 @@
         "kind": 5,
         "importPath": "backend.backend.settings",
         "description": "backend.backend.settings",
-        "peekOfCode": "SPECTACULAR_SETTINGS = {\n    'TITLE': 'Back API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True\n# # CORS_ALLOWED_ORIGINS = [\n# #     \"http://localhost:3000\",",
+        "peekOfCode": "SPECTACULAR_SETTINGS = {\n    'TITLE': 'Service API',\n    'VERSION': '1.0.0',\n    'SERVE_INCLUDE_SCHEMA': False,\n}\n# ALLOWED_HOSTS=[ ]\nCORS_ALLOW_ALL_ORIGINS = True\nCORS_ORIGIN_ALLOW_ALL = True\n# # CORS_ALLOWED_ORIGINS = [\n# #     \"http://localhost:3000\",",
         "detail": "backend.backend.settings",
         "documentation": {}
     },
@@ -1325,6 +1376,60 @@
         "description": "venv.bin.activate_this",
         "peekOfCode": "sys.prefix = base",
         "detail": "venv.bin.activate_this",
+        "documentation": {}
+    },
+    {
+        "label": "code",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "code = \"0279c0c44fc42aa3345e0e724a0632b9\"\nprefix = \"MySecretNuberIs_\"\ncodes = [\"f74ab58bf14d5daa76f3ac45955f992a\", \"1fe4d3175df6017982ba4a071f6b1b60\", \"31f71290797f7df507f8ba6c1d4c54ff\", \"45f7fe6c6eb37d10075985b67abf34ca\", \"09a21d6a244ee096261173c718883342\", \"1fbcc6c3832577fda3fc0f622111b0f1\", \"874c88009580ddb6d1f0b1ec933e642f\", \"1f0d0ea72895aeb0ae34f7e5b442721b\", \"c48e2ebd699299655bddf117cd0118fe\", \"dab90b6d1527f2ae3c4059a6f719e821\", \"3ac37da614bee6ec2e7e9ad6f5852dd8\", \"4b4b55dbbff14347656aa47ba7775d3e\", \"1927811792f88a3bca7096621f69e771\", \"073c7095bd87360317d30e4b2e91ccf7\", \"3eb34357ddb30096e79cb5ac8323ad35\", \"5efa3f5a222de026c57b4b48808d1ae1\", \"ebdefbd752e87462fa34c85cb92e3e85\", \"a7b05d3cd60d38ee001816d7672770d1\", \"b61dc4ff0c47c1e8cb662691fb3a2f16\", \"29a058aa9e2ca45f66988373ba1951aa\", \"46b23925b8c2ea830448fe4e892b10be\", \"8c0936fad85e8183a95c0cef97e52f97\", \"76e362d7f1928a7446e814298c49d3fc\", \"36327a78cb1882b950347b7af99f2bd2\", \"0b675ac8c7808eb306df102f9956dcb4\",\n         \"e0361cd6fd8ea6f4096483a39137263c\", \"da028029f16562e73501896134f89b64\", \"0279c0c44fc42aa3345e0e724a0632b9\", \"0477e4f96b91f8ebeffec0bd1669ff71\", \"f97371214734321537451da5a3491f84\", \"3490d4344fe6a8c9f16ec61d8a7cc250\", \"b66ebe00e0f8da9b3158ab868c26253b\", \"448a88754a0dd106a489a9a677c00b66\", \"844e735ce6f6ecc796949b57f722710b\", \"c53f1568bd4f072f2ba9e836c7388367\", \"58dfba14a56910f8e4834d727b75b8bc\", \"32fcf126fae80250209ed9c027d9a907\", \"2c69bba613a4f0bc090202fb637c102b\", \"115e1efd1692bf685e2e0f6c2b3c10a6\", \"197f0c0d65dc6097f3b1c4506e4fe4ea\", \"0253b601bccb3060eb2d22bb671ac465\", \"9bfafd774ba45323e67447826de1b75c\", \"cf0dbc67cff9060eb7fb7f887a8f2ca6\", \"836473307fa2a6dd0897f932dd53984e\", \"6faaadac456112c9f6b8d4174cfbb81b\", \"6b837eb46bf851b2a1b7db6ae4f4b15a\", \"bd4e7dea82c6ad186dda296fce855ab9\", \"3124a35362e14564f92b807ff4510240\", \"e6a6a3edeabbbb38e0459d3757b90498\", \"6e28c629a7750c74e42fdf7b5b9e6f64\", \"118458796bbb3c768ad301108f21c35d\"]\nalp = \"\"\"qwertyuiopasdfghjklzxcvbnm1234567890йцукенгшщзъхфывапролджэёячсмитьбю!\"'№%:,.;()_+@#$%^&*()-=~[]/?\\|§±     \\n\\t\"\"\"\nchars = [chr(i).encode() for i in range(1112063)]\nperms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s",
+        "detail": "md",
+        "documentation": {}
+    },
+    {
+        "label": "prefix",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "prefix = \"MySecretNuberIs_\"\ncodes = [\"f74ab58bf14d5daa76f3ac45955f992a\", \"1fe4d3175df6017982ba4a071f6b1b60\", \"31f71290797f7df507f8ba6c1d4c54ff\", \"45f7fe6c6eb37d10075985b67abf34ca\", \"09a21d6a244ee096261173c718883342\", \"1fbcc6c3832577fda3fc0f622111b0f1\", \"874c88009580ddb6d1f0b1ec933e642f\", \"1f0d0ea72895aeb0ae34f7e5b442721b\", \"c48e2ebd699299655bddf117cd0118fe\", \"dab90b6d1527f2ae3c4059a6f719e821\", \"3ac37da614bee6ec2e7e9ad6f5852dd8\", \"4b4b55dbbff14347656aa47ba7775d3e\", \"1927811792f88a3bca7096621f69e771\", \"073c7095bd87360317d30e4b2e91ccf7\", \"3eb34357ddb30096e79cb5ac8323ad35\", \"5efa3f5a222de026c57b4b48808d1ae1\", \"ebdefbd752e87462fa34c85cb92e3e85\", \"a7b05d3cd60d38ee001816d7672770d1\", \"b61dc4ff0c47c1e8cb662691fb3a2f16\", \"29a058aa9e2ca45f66988373ba1951aa\", \"46b23925b8c2ea830448fe4e892b10be\", \"8c0936fad85e8183a95c0cef97e52f97\", \"76e362d7f1928a7446e814298c49d3fc\", \"36327a78cb1882b950347b7af99f2bd2\", \"0b675ac8c7808eb306df102f9956dcb4\",\n         \"e0361cd6fd8ea6f4096483a39137263c\", \"da028029f16562e73501896134f89b64\", \"0279c0c44fc42aa3345e0e724a0632b9\", \"0477e4f96b91f8ebeffec0bd1669ff71\", \"f97371214734321537451da5a3491f84\", \"3490d4344fe6a8c9f16ec61d8a7cc250\", \"b66ebe00e0f8da9b3158ab868c26253b\", \"448a88754a0dd106a489a9a677c00b66\", \"844e735ce6f6ecc796949b57f722710b\", \"c53f1568bd4f072f2ba9e836c7388367\", \"58dfba14a56910f8e4834d727b75b8bc\", \"32fcf126fae80250209ed9c027d9a907\", \"2c69bba613a4f0bc090202fb637c102b\", \"115e1efd1692bf685e2e0f6c2b3c10a6\", \"197f0c0d65dc6097f3b1c4506e4fe4ea\", \"0253b601bccb3060eb2d22bb671ac465\", \"9bfafd774ba45323e67447826de1b75c\", \"cf0dbc67cff9060eb7fb7f887a8f2ca6\", \"836473307fa2a6dd0897f932dd53984e\", \"6faaadac456112c9f6b8d4174cfbb81b\", \"6b837eb46bf851b2a1b7db6ae4f4b15a\", \"bd4e7dea82c6ad186dda296fce855ab9\", \"3124a35362e14564f92b807ff4510240\", \"e6a6a3edeabbbb38e0459d3757b90498\", \"6e28c629a7750c74e42fdf7b5b9e6f64\", \"118458796bbb3c768ad301108f21c35d\"]\nalp = \"\"\"qwertyuiopasdfghjklzxcvbnm1234567890йцукенгшщзъхфывапролджэёячсмитьбю!\"'№%:,.;()_+@#$%^&*()-=~[]/?\\|§±     \\n\\t\"\"\"\nchars = [chr(i).encode() for i in range(1112063)]\nperms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s\n    hash_md5 = hashlib.md5(s.encode())",
+        "detail": "md",
+        "documentation": {}
+    },
+    {
+        "label": "codes",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "codes = [\"f74ab58bf14d5daa76f3ac45955f992a\", \"1fe4d3175df6017982ba4a071f6b1b60\", \"31f71290797f7df507f8ba6c1d4c54ff\", \"45f7fe6c6eb37d10075985b67abf34ca\", \"09a21d6a244ee096261173c718883342\", \"1fbcc6c3832577fda3fc0f622111b0f1\", \"874c88009580ddb6d1f0b1ec933e642f\", \"1f0d0ea72895aeb0ae34f7e5b442721b\", \"c48e2ebd699299655bddf117cd0118fe\", \"dab90b6d1527f2ae3c4059a6f719e821\", \"3ac37da614bee6ec2e7e9ad6f5852dd8\", \"4b4b55dbbff14347656aa47ba7775d3e\", \"1927811792f88a3bca7096621f69e771\", \"073c7095bd87360317d30e4b2e91ccf7\", \"3eb34357ddb30096e79cb5ac8323ad35\", \"5efa3f5a222de026c57b4b48808d1ae1\", \"ebdefbd752e87462fa34c85cb92e3e85\", \"a7b05d3cd60d38ee001816d7672770d1\", \"b61dc4ff0c47c1e8cb662691fb3a2f16\", \"29a058aa9e2ca45f66988373ba1951aa\", \"46b23925b8c2ea830448fe4e892b10be\", \"8c0936fad85e8183a95c0cef97e52f97\", \"76e362d7f1928a7446e814298c49d3fc\", \"36327a78cb1882b950347b7af99f2bd2\", \"0b675ac8c7808eb306df102f9956dcb4\",\n         \"e0361cd6fd8ea6f4096483a39137263c\", \"da028029f16562e73501896134f89b64\", \"0279c0c44fc42aa3345e0e724a0632b9\", \"0477e4f96b91f8ebeffec0bd1669ff71\", \"f97371214734321537451da5a3491f84\", \"3490d4344fe6a8c9f16ec61d8a7cc250\", \"b66ebe00e0f8da9b3158ab868c26253b\", \"448a88754a0dd106a489a9a677c00b66\", \"844e735ce6f6ecc796949b57f722710b\", \"c53f1568bd4f072f2ba9e836c7388367\", \"58dfba14a56910f8e4834d727b75b8bc\", \"32fcf126fae80250209ed9c027d9a907\", \"2c69bba613a4f0bc090202fb637c102b\", \"115e1efd1692bf685e2e0f6c2b3c10a6\", \"197f0c0d65dc6097f3b1c4506e4fe4ea\", \"0253b601bccb3060eb2d22bb671ac465\", \"9bfafd774ba45323e67447826de1b75c\", \"cf0dbc67cff9060eb7fb7f887a8f2ca6\", \"836473307fa2a6dd0897f932dd53984e\", \"6faaadac456112c9f6b8d4174cfbb81b\", \"6b837eb46bf851b2a1b7db6ae4f4b15a\", \"bd4e7dea82c6ad186dda296fce855ab9\", \"3124a35362e14564f92b807ff4510240\", \"e6a6a3edeabbbb38e0459d3757b90498\", \"6e28c629a7750c74e42fdf7b5b9e6f64\", \"118458796bbb3c768ad301108f21c35d\"]\nalp = \"\"\"qwertyuiopasdfghjklzxcvbnm1234567890йцукенгшщзъхфывапролджэёячсмитьбю!\"'№%:,.;()_+@#$%^&*()-=~[]/?\\|§±     \\n\\t\"\"\"\nchars = [chr(i).encode() for i in range(1112063)]\nperms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s\n    hash_md5 = hashlib.md5(s.encode())\n    hash = hash_md5.hexdigest()",
+        "detail": "md",
+        "documentation": {}
+    },
+    {
+        "label": "alp",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "alp = \"\"\"qwertyuiopasdfghjklzxcvbnm1234567890йцукенгшщзъхфывапролджэёячсмитьбю!\"'№%:,.;()_+@#$%^&*()-=~[]/?\\|§±     \\n\\t\"\"\"\nchars = [chr(i).encode() for i in range(1112063)]\nperms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s\n    hash_md5 = hashlib.md5(s.encode())\n    hash = hash_md5.hexdigest()\n    if hash in codes:\n        print(hash, i, codes.index(hash))",
+        "detail": "md",
+        "documentation": {}
+    },
+    {
+        "label": "chars",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "chars = [chr(i).encode() for i in range(1112063)]\nperms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s\n    hash_md5 = hashlib.md5(s.encode())\n    hash = hash_md5.hexdigest()\n    if hash in codes:\n        print(hash, i, codes.index(hash))\n        # break",
+        "detail": "md",
+        "documentation": {}
+    },
+    {
+        "label": "perms",
+        "kind": 5,
+        "importPath": "md",
+        "description": "md",
+        "peekOfCode": "perms = itertools.combinations_with_replacement(chars, 4)\nfor i in perms:\n    s = \"\".join(i)\n    s = prefix + s\n    hash_md5 = hashlib.md5(s.encode())\n    hash = hash_md5.hexdigest()\n    if hash in codes:\n        print(hash, i, codes.index(hash))\n        # break",
+        "detail": "md",
         "documentation": {}
     }
 ]
