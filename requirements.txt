@@ -1,7 +1,6 @@
 asgiref==3.6.0
 async-timeout==4.0.2
 attrs==23.1.0
--e git+ssh://git@github.com/puzzzik/networking.git@1e9e77f421a2cbe6cfce09efe9ccd8a6039f397d#egg=backend
 certifi==2022.12.7
 Django==4.2
 django-cors-headers==3.14.0
@@ -22,5 +21,6 @@ pytz==2023.3
 PyYAML==6.0
 redis==4.5.4
 sqlparse==0.4.4
+-e git+ssh://git@github.com/puzzzik/networking.git@af258da36664f4841a1064b0f861e16d83a1acce#egg=src
 uritemplate==4.1.1
 urllib3==1.26.15
