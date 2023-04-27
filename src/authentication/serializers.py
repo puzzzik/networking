@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from app.models import Folder
+from backend.app.models import Folder
 from .backends import *
 
 

@@ -84,4 +84,3 @@ class User(AbstractBaseUser, PermissionsMixin):
             return folder
         except:
             return None
-

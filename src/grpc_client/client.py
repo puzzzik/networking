@@ -2,7 +2,7 @@ import logging
 import grpc
 import file_service_pb2
 from file_service_pb2_grpc import GreeterStub
-from app.models import File
+from backend.app.models import File
 
 
 class Client:
@@ -23,7 +23,7 @@ class Client:
                     chunk_data=chunk_data,
                     meta=file_service_pb2.MetaData(
                         filename=file.name,
-                        extension=file.extension,
+                        extension="",
                         bucket=bucket_name
                     )
                 )

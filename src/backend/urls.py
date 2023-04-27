@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-import app.urls
-import spectacular.urls
+import backend.app.urls
+import backend.spectacular.urls
 from rest_framework import routers
-
 
 router = routers.DefaultRouter()
 # router.register(r'products', ProductViewSet, basename='products')
@@ -26,9 +25,9 @@ router = routers.DefaultRouter()
 # router.register(r'cart', CartViewSet)
 
 urlpatterns = [
-    path('', include(spectacular.urls)),
+    path('', include(backend.spectacular.urls)),
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('', include('authentication.urls', namespace='authentication')),
-    path('', include(app.urls))
+    path('', include(backend.app.urls))
 ]

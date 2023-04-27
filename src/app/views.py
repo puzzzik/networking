@@ -5,8 +5,10 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 from rest_framework.response import Response
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from .serializers import *
-from authentication.models import User
-from ..grpc_client.client import Client
+from backend.authentication.models import User
+from backend.grpc_client.client import Client
+
+
 @extend_schema(responses=FileSerializer(many=True))
 @api_view(['GET'])
 def list_files(request: Request):

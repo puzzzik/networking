@@ -1,5 +1,5 @@
 from django.db import models
-from authentication.models import User
+from backend.authentication import User
 from django.utils.timezone import now as date_now
 
 

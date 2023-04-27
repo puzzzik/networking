@@ -4,7 +4,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from drf_spectacular.authentication import OpenApiAuthenticationExtension
-from authentication.backends import JWTAuthentication
+from backend.authentication.backends import JWTAuthentication
 
 
 class JWTAuthenticationScheme(OpenApiAuthenticationExtension):
