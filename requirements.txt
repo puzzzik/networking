@@ -1,1 +1,26 @@
--e git+ssh://git@github.com/puzzzik/networking.git@edd667edd40fa0f97b7395335ce35744e5296182#egg=backend
+asgiref==3.6.0
+async-timeout==4.0.2
+attrs==23.1.0
+-e git+ssh://git@github.com/puzzzik/networking.git@1e9e77f421a2cbe6cfce09efe9ccd8a6039f397d#egg=backend
+certifi==2022.12.7
+Django==4.2
+django-cors-headers==3.14.0
+django-redis==5.2.0
+djangorestframework==3.14.0
+drf-spectacular==0.26.2
+grpcio==1.54.0
+grpcio-tools==1.54.0
+inflection==0.5.1
+jsonschema==4.17.3
+minio==7.1.14
+protobuf==4.22.3
+psycopg2-binary==2.9.6
+PyJWT==2.6.0
+pyrsistent==0.19.3
+python-dotenv==1.0.0
+pytz==2023.3
+PyYAML==6.0
+redis==4.5.4
+sqlparse==0.4.4
+uritemplate==4.1.1
+urllib3==1.26.15
