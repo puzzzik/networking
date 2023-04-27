@@ -4,6 +4,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
+import backend
+from drf_spectacular.utils import extend_schema
 
 
 class RegistrationAPIView(APIView):
@@ -53,12 +55,11 @@ class LoginAPIView(APIView):
         user = User.objects.get(email=serializer.data.get('email'))
         token = serializer.data.get('token')
         response.set_cookie(key='uid', value=user.pk, httponly=True)
-        redis_connect.set(user.pk, value=token)
+        backend.redis_connect.set(user.pk, value=token)
         return response
 
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
-
     permission_classes = [IsAuthenticated]
     # renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer

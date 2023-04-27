@@ -1,8 +1,11 @@
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiTypes
-
+from rest_framework.response import Response
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from .serializers import *
+from authentication.models import User
 
 
 @extend_schema(responses=FileSerializer(many=True))
@@ -36,13 +39,27 @@ def get_file(request: Request):
 def post_file_info(request: Request):
     request_user = request.user
     user = User.objects.get(pk=request_user.pk)
+    files = request.FILES
+    print(files)
+    return Response()
 
 
 @extend_schema(
-    parameters=[OpenApiParameter("file", OpenApiTypes.BINARY)],
-    request={"file": OpenApiTypes.BINARY}
+    request={
+        "multipart/form-data": {
+            "type": "object",
+            "properties": {
+                "file_field": {"type": "string", "format": "binary"}
+            },
+        },
+    },
 )
 @api_view(['POST'])
 def post_file(request: Request):
     request_user = request.user
     user = User.objects.get(pk=request_user.pk)
+    file: InMemoryUploadedFile = request.FILES['file_field']
+    print(file.name)
+    print(file.size)
+    print(file.content_type)
+    return Response()

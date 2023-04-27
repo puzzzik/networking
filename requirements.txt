@@ -8,3 +8,5 @@ django-cors-headers
 django_redis
 drf-spectacular
 PyJWT
+grpcio
+grpcio_tools
