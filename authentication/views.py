@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 import backend
-from drf_spectacular.utils import extend_schema
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RegistrationAPIView(APIView):
@@ -16,7 +16,7 @@ class RegistrationAPIView(APIView):
     serializer_class = RegistrationSerializer
 
     # renderer_classes = (UserJSONRenderer,)
-
+    @swagger_auto_schema(request_body=RegistrationSerializer, responses={200: RegistrationSerializer()})
     def post(self, request):
         """
         Creates a new User object.
@@ -41,7 +41,7 @@ class LoginAPIView(APIView):
     serializer_class = LoginSerializer
 
     # renderer_classes = (UserJSONRenderer,)
-
+    @swagger_auto_schema(request_body=LoginSerializer, responses={200: LoginSerializer()})
     def post(self, request):
         """
         Checks is user exists.

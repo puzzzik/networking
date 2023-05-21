@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from backend.app.models import Folder
+# from app.models import Folder
 from .backends import *
 
 
@@ -29,8 +29,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        folder = Folder.objects.create(user=user, name=user.get_short_name())
-        folder.save()
+        # folder = Folder.objects.create(user=user, name=user.get_short_name())
+        # folder.save()
         return user
 
 

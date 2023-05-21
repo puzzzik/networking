@@ -39,10 +39,9 @@ INSTALLED_APPS = [
     'app',
     'rest_framework',
     'authentication',
-    'drf_spectacular',
-    'spectacular',
     'corsheaders',
-    'grpc_client'
+    'grpc_client',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
@@ -160,10 +159,12 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Service API',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': '/login/',
+    'LOGOUT_URL': '/logout/',
+    'SECURITY_DEFINITIONS': {
+    }
 }
 
 # ALLOWED_HOSTS=[ ]

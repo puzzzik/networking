@@ -1,6 +1,4 @@
-from datetime import datetime
-from datetime import timedelta
-
+from datetime import datetime, timedelta
 import jwt
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
@@ -74,13 +72,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
         return token
 
-    def get_folder(self):
-        import sys
-        sys.path.append(".")
-
-        from ..app.models import Folder
-        try:
-            folder = self.folder
-            return folder
-        except:
-            return None
+    def get_bucket_name(self):
+        return self.get_full_name().replace(' ', '_') + '-bucket'
