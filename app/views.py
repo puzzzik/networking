@@ -18,6 +18,7 @@ from backend import redis_connect
 from drf_yasg import openapi
 from grpc_client.file_service_pb2 import MetaData
 from django.http import HttpResponse, JsonResponse
+from django.core import exceptions
 from wsgiref.util import FileWrapper
 import unicodedata
 from io import BytesIO
@@ -56,7 +57,7 @@ def list_files(request: Request):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-file_parameter = Parameter('file_name', openapi.IN_QUERY, type=openapi.TYPE_STRING)
+file_parameter = Parameter('file_name', openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True)
 
 
 @swagger_auto_schema(
@@ -79,6 +80,7 @@ def get_file(request: Request):
     try:
         response = Client().download_file(bucket_name=user.get_bucket_name(), file_name=file_name)
     except grpc.RpcError as e:
+        print(e)
         return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
     data = response.chunk_data
@@ -110,8 +112,8 @@ def post_file_info(request: Request):
 @swagger_auto_schema(
     methods=['post'],
     manual_parameters=[
-        Parameter(name='file', in_=openapi.IN_FORM, type=openapi.TYPE_FILE),
-        Parameter(name='last_modified', in_=openapi.IN_FORM, type=openapi.TYPE_STRING)
+        Parameter(name='file', in_=openapi.IN_FORM, type=openapi.TYPE_FILE, required=True),
+        Parameter(name='last_modified', in_=openapi.IN_FORM, type=openapi.TYPE_STRING, required=True)
     ],
     responses={
         200: FileSerializer(),
@@ -172,6 +174,31 @@ def logout(request: Request):
     response.delete_cookie(key='uid')
     redis_connect.delete(user.pk)
     return response
+
+
+@swagger_auto_schema(
+    methods=['delete'],
+    manual_parameters=[
+        Parameter(name='file_name', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, required=True)
+    ],
+    responses={
+        200: "OK",
+        204: "No Content"
+    }
+)
+@api_view(['DELETE'])
+def remove_file(request: Request):
+    user = User.objects.get(pk=request.user.pk)
+    file_name = request.query_params.get('file_name')
+    try:
+        Client().remove_file(file_name=file_name, bucket_name=user.get_bucket_name())
+    except:
+        return Response("No Content", status=status.HTTP_204_NO_CONTENT)
+    try:
+        user.file_set.get(name=file_name).delete()
+    except:
+        pass
+    return Response("OK", status=status.HTTP_200_OK)
 
 
 def md5(file: InMemoryUploadedFile):

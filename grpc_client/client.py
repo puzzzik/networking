@@ -2,7 +2,7 @@ from base64 import b64encode
 
 import grpc
 from app.models import File as ModelsFile
-from .file_service_pb2 import File, MetaData, DownloadRequest, FileListRequest, GetFileRequest
+from .file_service_pb2 import File, MetaData, DownloadRequest, FileListRequest, GetFileRequest, RemoveFileRequest
 from .file_service_pb2_grpc import GreeterStub
 
 
@@ -32,10 +32,15 @@ class Client:
                     )
                 )
 
-    def remove_file(self, file: ModelsFile):
+    def remove_file(self, file_name: str, bucket_name: str):
         with grpc.insecure_channel(self.host) as channel:
             stub = GreeterStub(channel)
-            stub.RemoveFile(bucket=file.get_bucket_name(), file_name=file.name)
+            stub.RemoveFile(
+                RemoveFileRequest(
+                    bucket=bucket_name,
+                    filename=file_name
+                )
+            )
 
     def get_file_info(self, bucket_name: str, file_name: str) -> MetaData:
         with grpc.insecure_channel(self.host) as channel:

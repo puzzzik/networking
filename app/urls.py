@@ -5,5 +5,6 @@ urlpatterns = [
     path('get_file/', get_file),
     path('list_files/', list_files),
     path('post_file/', post_file),
-    path('logout/', logout)
+    path('logout/', logout),
+    path('remove_file/', remove_file)
 ]
