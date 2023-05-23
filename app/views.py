@@ -3,7 +3,7 @@ import hashlib
 
 import grpc
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -23,6 +23,7 @@ from wsgiref.util import FileWrapper
 import unicodedata
 from io import BytesIO
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import FormParser, MultiPartParser
 
 
 @swagger_auto_schema(methods=['get'], responses={200: FileSerializer(many=True)})
@@ -127,6 +128,7 @@ def post_file_info(request: Request):
     }
 )
 @api_view(['POST'])
+@parser_classes([MultiPartParser])
 def post_file(request: Request):
     user = User.objects.get(pk=request.user.pk)
     uploaded_file: InMemoryUploadedFile = request.FILES['file']
