@@ -25,6 +25,8 @@ from io import BytesIO
 from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import FormParser, MultiPartParser
 
+from base64 import b64encode
+
 
 @swagger_auto_schema(methods=['get'], responses={200: FileSerializer(many=True)})
 @api_view(['GET'])
@@ -87,7 +89,7 @@ def get_file(request: Request):
         print(e)
         return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
-    data = response.chunk_data
+    data = b64encode(response.chunk_data)
     meta = response.meta
 
     db_file, created = user.files.get_or_create(name=meta.filename, defaults={
