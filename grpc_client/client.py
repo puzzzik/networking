@@ -29,6 +29,7 @@ class Client:
                         bucket=file.get_bucket_name(),
                         filename=str(file.name),
                         last_modified=file.last_modified,
+                        content_type=file.content_type
                     )
                 )
 

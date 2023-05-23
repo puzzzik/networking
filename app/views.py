@@ -38,13 +38,15 @@ def list_files(request: Request):
                 'name': metadata.filename,
                 'last_modified': metadata.last_modified,
                 'hash': metadata.hash,
-                'size': metadata.size
+                'size': metadata.size,
+                'content_type': metadata.content_type
             }
         )
         if not created:
             file.last_modified = metadata.last_modified
             file.hash = metadata.hash
             file.size = file.size
+            file.content_type = file.content_type
         else:
             user.file_set.add(file)
         file.save()
@@ -90,13 +92,15 @@ def get_file(request: Request):
         'name': meta.filename,
         'size': meta.size,
         'hash': meta.hash,
-        'last_modified': meta.last_modified
+        'last_modified': meta.last_modified,
+        'content_type': meta.content_type
     })
     if not created:
         db_file.size = meta.size
         db_file.hash = meta.hash
         db_file.last_modified = meta.last_modified
-    response = HttpResponse(data, content_type='application/octet-stream')
+        db_file.content_type = meta.content_type
+    response = HttpResponse(data, content_type=meta.content_type)
     response['Content-Disposition'] = unidecode.unidecode('attachment; filename="' + file_name + '"')
     return response
 
@@ -130,7 +134,8 @@ def post_file(request: Request):
         name=uploaded_file.name,
         size=uploaded_file.size,
         last_modified=request.data['last_modified'],
-        hash=md5(uploaded_file)
+        hash=md5(uploaded_file),
+        content_type=uploaded_file.content_type
     )
 
     try:
@@ -144,6 +149,7 @@ def post_file(request: Request):
             file.size = metadata.size
             file.hash = metadata.hash
             file.last_modified = metadata.last_modified
+            file.content_type = metadata.content_type
             file.save()
 
             return Response(FileSerializer(file).data, status=status.HTTP_200_OK)
@@ -163,6 +169,7 @@ def post_file(request: Request):
         file.size = metadata.size
         file.hash = metadata.hash
         file.last_modified = metadata.last_modified
+        file.content_type = metadata.content_type
         file.save()
     return Response(FileSerializer(file).data, status=status.HTTP_200_OK)
 

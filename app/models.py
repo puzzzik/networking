@@ -9,6 +9,7 @@ class File(models.Model):
     size = models.FloatField(default=0)
     hash = models.CharField(max_length=300)
     user = models.ManyToManyField(User)
+    content_type = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
