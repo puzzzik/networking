@@ -31,7 +31,7 @@ from rest_framework.parsers import FormParser, MultiPartParser
 def list_files(request: Request):
     user = User.objects.get(pk=request.user.pk)
     file_list: list[MetaData] = Client().get_file_list(user.get_bucket_name())
-    files_in_db = user.file_set.all()
+    files_in_db = user.files.all()
     for metadata in file_list:
         file, created = files_in_db.get_or_create(
             name=metadata.filename,
@@ -40,7 +40,8 @@ def list_files(request: Request):
                 'last_modified': metadata.last_modified,
                 'hash': metadata.hash,
                 'size': metadata.size,
-                'content_type': metadata.content_type
+                'content_type': metadata.content_type,
+                'user_id': user.pk
             }
         )
         if not created:
@@ -49,11 +50,11 @@ def list_files(request: Request):
             file.size = file.size
             file.content_type = file.content_type
         else:
-            user.file_set.add(file)
+            user.files.add(file)
         file.save()
     files_in_db.exclude(name__in=[f.filename for f in file_list]).delete()
     try:
-        files_serializer = FileSerializer(user.file_set.all(), many=True)
+        files_serializer = FileSerializer(user.files.all(), many=True)
         return Response(files_serializer.data)
     except Exception as e:
         print(e)
@@ -89,7 +90,7 @@ def get_file(request: Request):
     data = response.chunk_data
     meta = response.meta
 
-    db_file, created = user.file_set.get_or_create(name=meta.filename, defaults={
+    db_file, created = user.files.get_or_create(name=meta.filename, defaults={
         'name': meta.filename,
         'size': meta.size,
         'hash': meta.hash,
@@ -104,14 +105,6 @@ def get_file(request: Request):
     response = HttpResponse(data, content_type=meta.content_type)
     response['Content-Disposition'] = unidecode.unidecode('attachment; filename="' + file_name + '"')
     return response
-
-
-@swagger_auto_schema(methods=['post'], request_body=FileSerializer, responses={200: FileSerializer()})
-@api_view(['POST'])
-def post_file_info(request: Request):
-    request_user = request.user
-    user = User.objects.get(pk=request_user.pk)
-    return Response()
 
 
 @swagger_auto_schema(
@@ -144,9 +137,9 @@ def post_file(request: Request):
         server_file_meta = Client().get_file_info(bucket_name=user.get_bucket_name(), file_name=uploaded_file.name)
     except grpc.RpcError as e:
         if e.code() == grpc.StatusCode.NOT_FOUND:
+            file.user = user
             file.save()
-            user.file_set.filter(name=file.name).delete()
-            user.file_set.add(file)
+            user.files.filter(name=file.name).exclude(pk=file.pk).delete()
             metadata: MetaData = Client().upload_file(file=file, data=uploaded_file)
             file.size = metadata.size
             file.hash = metadata.hash
@@ -164,9 +157,9 @@ def post_file(request: Request):
     if file.last_modified < server_file_meta.last_modified:
         return Response("Old file", status=status.HTTP_409_CONFLICT)
     else:
+        file.user = user
         file.save()
-        user.file_set.filter(name=file.name).delete()
-        user.file_set.add(file)
+        user.files.filter(name=file.name).exclude(pk=file.pk).delete()
         metadata: MetaData = Client().upload_file(file=file, data=uploaded_file)
         file.size = metadata.size
         file.hash = metadata.hash
@@ -204,7 +197,7 @@ def remove_file(request: Request):
     except:
         return Response("No Content", status=status.HTTP_204_NO_CONTENT)
     try:
-        user.file_set.get(name=file_name).delete()
+        user.files.get(name=file_name).delete()
     except:
         pass
     return Response("OK", status=status.HTTP_200_OK)

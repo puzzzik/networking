@@ -8,14 +8,15 @@ class File(models.Model):
     last_modified = models.CharField(max_length=100)
     size = models.FloatField(default=0)
     hash = models.CharField(max_length=300)
-    user = models.ManyToManyField(User)
+    # user = models.ManyToManyField(User)
     content_type = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="files")
 
     def __str__(self):
         return self.name
 
     def get_bucket_name(self):
-        return self.user.get().get_bucket_name()
+        return self.user.get_bucket_name()
 
 
 # class Folder(models.Model):
